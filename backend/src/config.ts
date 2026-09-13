@@ -23,3 +23,5 @@ export const REFRESH_TOKEN = {
         } as CookieOptions,
     },
 }
+
+export const { CSRF_SECRET = 'CSRF_SECRET' } = process.env
