@@ -12,7 +12,7 @@ export enum PaymentType {
 // валидация id
 export const validateOrderBody = celebrate({
     body: Joi.object().keys({
-        items: Joi.array()
+        items: Joi.array().max(100)
             .items(
                 Joi.string().custom((value, helpers) => {
                     if (Types.ObjectId.isValid(value)) {

@@ -22,8 +22,8 @@ app.use(doubleCsrfProtection)
 
 app.use(serveStatic(path.join(__dirname, 'public')))
 
-app.use(urlencoded({ extended: true }))
-app.use(json())
+app.use(urlencoded({ extended: true, limit: '10kb' }))
+app.use(json({ limit: '10kb' }))
 
 app.use(routes)
 app.use(errors())
