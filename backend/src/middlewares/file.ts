@@ -36,13 +36,7 @@ const storage = multer.diskStorage({
     },
 })
 
-const types = [
-    'image/png',
-    'image/jpg',
-    'image/jpeg',
-    'image/gif',
-    'image/svg+xml',
-]
+const types = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif']
 
 const fileFilter = (
     _req: Request,
