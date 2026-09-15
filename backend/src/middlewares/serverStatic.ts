@@ -27,12 +27,18 @@ export default function serveStatic(baseDir: string) {
                 // Файл не существует отдаем дальше мидлварам
                 return next()
             }
-            // Файл существует, отправляем его клиенту
-            return res.sendFile(filePath, (err) => {
-                if (err) {
-                    next(err)
+            // Файл существует, отправляем его клиенту.
+            // Имя файла — случайный uuid (см. middlewares/file.ts), при повторной
+            // загрузке никогда не переиспользуется, поэтому долгий immutable-кэш безопасен.
+            return res.sendFile(
+                filePath,
+                { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+                (sendErr) => {
+                    if (sendErr) {
+                        next(sendErr)
+                    }
                 }
-            })
+            )
         })
     }
 }
