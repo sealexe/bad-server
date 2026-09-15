@@ -30,9 +30,12 @@ export type ApiListResponse<Type> = {
     items: Type[]
 }
 
+const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+
 class Api {
     private readonly baseUrl: string
     protected options: RequestInit
+    private csrfTokenPromise: Promise<string> | null = null
 
     constructor(baseUrl: string, options: RequestInit = {}) {
         this.baseUrl = baseUrl
@@ -53,11 +56,39 @@ class Api {
                   )
     }
 
+    private getCsrfToken = (): Promise<string> => {
+        if (!this.csrfTokenPromise) {
+            this.csrfTokenPromise = fetch(`${this.baseUrl}/auth/csrf-token`, {
+                credentials: 'include',
+            })
+                .then((res) => res.json())
+                .then(({ csrfToken }) => csrfToken)
+                .catch((error) => {
+                    this.csrfTokenPromise = null
+                    return Promise.reject(error)
+                })
+        }
+        return this.csrfTokenPromise
+    }
+
     protected async request<T>(endpoint: string, options: RequestInit) {
         try {
+            const method = (options.method ?? 'GET').toUpperCase()
+            const csrfHeaders: Record<string, string> = SAFE_METHODS.includes(
+                method
+            )
+                ? {}
+                : { 'X-CSRF-Token': await this.getCsrfToken() }
+
             const res = await fetch(`${this.baseUrl}${endpoint}`, {
+                credentials: 'include',
                 ...this.options,
                 ...options,
+                headers: {
+                    ...(this.options.headers as Record<string, string>),
+                    ...(options.headers as Record<string, string>),
+                    ...csrfHeaders,
+                },
             })
             return await this.handleResponse<T>(res)
         } catch (error) {

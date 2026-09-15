@@ -19,6 +19,10 @@ const getProducts = async (req: Request, res: Response, next: NextFunction) => {
         const products = await Product.find({}, null, options)
         const totalProducts = await Product.countDocuments({})
         const totalPages = Math.ceil(totalProducts / Number(limit))
+        // Публичный листинг без авторизации — самый частый запрос (главная страница),
+        // короткий кэш снижает нагрузку на БД, но не даёт каталогу надолго "протухнуть"
+        // после создания/правки/удаления товара админом.
+        res.set('Cache-Control', 'public, max-age=60')
         return res.send({
             items: products,
             pagination: {
