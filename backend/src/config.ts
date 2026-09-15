@@ -27,6 +27,6 @@ export const REFRESH_TOKEN = {
 export const { CSRF_SECRET = 'CSRF_SECRET' } = process.env
 
 export const RATE_LIMITED = process.env.RATE_LIMITED !== 'false'
-export const RATE_LIMIT_POINTS = Number(process.env.RATE_LIMIT_POINTS) || 20
+export const RATE_LIMIT_POINTS = Number(process.env.RATE_LIMIT_POINTS) || 60
 export const RATE_LIMIT_DURATION = Number(process.env.RATE_LIMIT_DURATION) || 60
 export const RATE_LIMIT_BLOCK = Number(process.env.RATE_LIMIT_BLOCK) || 60
