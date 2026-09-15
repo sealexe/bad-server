@@ -13,11 +13,17 @@ const rateLimiter = new RateLimiterMemory({
     blockDuration: RATE_LIMIT_BLOCK,
 })
 
+const RATE_LIMIT_EXEMPT_PATHS = ['/auth/csrf-token']
+
 const rateLimiterMiddleware = (
     req: Request,
     _res: Response,
     next: NextFunction
 ) => {
+    if (RATE_LIMIT_EXEMPT_PATHS.includes(req.path)) {
+        return next()
+    }
+
     rateLimiter
         .consume(req.ip || req.socket.remoteAddress || 'unknown')
         .then(() => next())
