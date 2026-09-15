@@ -6,8 +6,9 @@ import express, { json, urlencoded } from 'express'
 import mongoose from 'mongoose'
 import path from 'path'
 import { doubleCsrfProtection } from './middlewares/csrf'
-import { DB_ADDRESS, ORIGIN_ALLOW } from './config'
+import { DB_ADDRESS, ORIGIN_ALLOW, RATE_LIMITED } from './config'
 import errorHandler from './middlewares/error-handler'
+import rateLimiterMiddleware from './middlewares/rateLimiter'
 import serveStatic from './middlewares/serverStatic'
 import routes from './routes'
 
@@ -16,6 +17,9 @@ const app = express()
 
 app.use(cookieParser())
 app.use(cors({ origin: ORIGIN_ALLOW, credentials: true }))
+if (RATE_LIMITED) {
+    app.use(rateLimiterMiddleware)
+}
 app.use(doubleCsrfProtection)
 
 // app.use(express.static(path.join(__dirname, 'public')));
